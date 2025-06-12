@@ -1,3 +1,5 @@
+let dataAtualExibida;
+
 document.addEventListener('DOMContentLoaded', async function() {
     try {
         const { user, dados: medico } = await checkAuth('medico');
@@ -6,20 +8,19 @@ document.addEventListener('DOMContentLoaded', async function() {
         document.getElementById('medico-nome').textContent = medico.get('nome');
         document.getElementById('medico-especialidade').textContent = medico.get('especialidade');
         
-        // Carregar consultas
-        await carregarConsultasDoDia(new Date());
+        // CORREÇÃO: Inicializa a nossa variável com a data de hoje
+        dataAtualExibida = new Date();
+        await carregarConsultasDoDia(dataAtualExibida);
         
-        // Event listeners
+        // CORREÇÃO: Os botões agora modificam a variável, em vez de ler o HTML
         document.getElementById('prev-day').addEventListener('click', async () => {
-            const currentDate = new Date(document.getElementById('current-date').textContent);
-            currentDate.setDate(currentDate.getDate() - 1);
-            await carregarConsultasDoDia(currentDate);
+            dataAtualExibida.setDate(dataAtualExibida.getDate() - 1);
+            await carregarConsultasDoDia(dataAtualExibida);
         });
         
         document.getElementById('next-day').addEventListener('click', async () => {
-            const currentDate = new Date(document.getElementById('current-date').textContent);
-            currentDate.setDate(currentDate.getDate() + 1);
-            await carregarConsultasDoDia(currentDate);
+            dataAtualExibida.setDate(dataAtualExibida.getDate() + 1);
+            await carregarConsultasDoDia(dataAtualExibida);
         });
         
     } catch (error) {
@@ -33,10 +34,17 @@ async function carregarConsultasDoDia(date) {
     listaConsultas.innerHTML = '<p class="loading">Carregando consultas...</p>';
     
     try {
-        // Formatar data
+        // Formatar data para exibição
         const options = { weekday: 'long', day: 'numeric', month: 'long' };
         document.getElementById('current-date').textContent = date.toLocaleDateString('pt-BR', options);
         
+        // CORREÇÃO: Criar datas de início e fim do dia sem modificar a data original
+        const inicioDoDia = new Date(date);
+        inicioDoDia.setHours(0, 0, 0, 0);
+
+        const fimDoDia = new Date(date);
+        fimDoDia.setHours(23, 59, 59, 999);
+
         // Buscar consultas
         const Consulta = Parse.Object.extend('Consulta');
         const query = new Parse.Query(Consulta);
@@ -46,9 +54,9 @@ async function carregarConsultasDoDia(date) {
         const medico = await medicoQuery.first();
         
         query.equalTo('medico', medico);
-        query.greaterThanOrEqualTo('data', new Date(date.setHours(0, 0, 0)));
-        query.lessThan('data', new Date(date.setHours(23, 59, 59)));
-        query.include('paciente');
+        query.greaterThanOrEqualTo('data', inicioDoDia);
+        query.lessThanOrEqualTo('data', fimDoDia); // Usando lessThanOrEqualTo para incluir o fim do dia
+        query.include('paciente'); // Assumindo que o schema aponta para a classe Paciente
         query.ascending('data');
         
         const consultas = await query.find();
@@ -57,7 +65,7 @@ async function carregarConsultasDoDia(date) {
         listaConsultas.innerHTML = '';
         
         if (consultas.length === 0) {
-            listaConsultas.innerHTML = '<p class="empty">Nenhuma consulta agendada</p>';
+            listaConsultas.innerHTML = '<p class="empty-message">Nenhuma consulta para este dia.</p>';
             return;
         }
         
@@ -66,23 +74,26 @@ async function carregarConsultasDoDia(date) {
             item.className = 'consulta-item';
             
             const paciente = consulta.get('paciente');
-            const data = new Date(consulta.get('data'));
+            const dataConsulta = new Date(consulta.get('data'));
+
+            // Verifica se o objeto paciente e o nome existem antes de tentar acessá-los
+            const nomePaciente = paciente ? paciente.get('nome') : 'Paciente não encontrado';
             
             item.innerHTML = `
                 <div class="consulta-horario">
-                    ${data.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                    ${dataConsulta.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
                 </div>
                 <div class="consulta-info">
-                    <h4>${paciente.get('nome')}</h4>
+                    <h4>${nomePaciente}</h4>
                     <p>${consulta.get('tipo')}</p>
                     <span class="status ${consulta.get('status')}">${consulta.get('status')}</span>
                 </div>
                 <div class="consulta-actions">
-                    <button class="btn-confirm" onclick="confirmarConsulta('${consulta.id}')">
-                        Confirmar
+                    <button class="btn-confirm" onclick="confirmarConsulta('${consulta.id}')" title="Confirmar">
+                        ✔
                     </button>
-                    <button class="btn-cancel" onclick="cancelarConsulta('${consulta.id}')">
-                        Cancelar
+                    <button class="btn-cancel" onclick="cancelarConsulta('${consulta.id}')" title="Cancelar">
+                        ✖
                     </button>
                 </div>
             `;
@@ -92,7 +103,7 @@ async function carregarConsultasDoDia(date) {
         
     } catch (error) {
         console.error('Erro ao carregar consultas:', error);
-        listaConsultas.innerHTML = '<p class="error">Erro ao carregar consultas</p>';
+        listaConsultas.innerHTML = '<p class="error-message">Erro ao carregar consultas.</p>';
     }
 }
 
