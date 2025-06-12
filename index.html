@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agenda Médica - Login</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <script src="https://npmcdn.com/parse/dist/parse.min.js"></script>
+    <script src="scripts/parseConfig.js"></script>
+</head>
+<body>
+    <div class="login-wrapper">
+        <div class="login-container">
+            <h1>Agenda Médica</h1>
+            
+            <div class="tabs">
+                <button class="tab-button active" onclick="openTab('paciente', event)">Paciente</button>
+                <button class="tab-button" onclick="openTab('medico', event)">Médico</button>
+            </div>
+
+            <!-- Formulário Paciente -->
+            <div id="paciente" class="tab-content active">
+                <form id="form-paciente">
+                    <input type="text" placeholder="CPF" required>
+                    <input type="password" placeholder="Senha" required>
+                    <button type="submit">Entrar</button>
+                    <p class="cadastro-link">Não tem conta? <a href="#" onclick="mostrarCadastro('paciente')">Cadastre-se</a></p>
+                </form>
+
+                <form id="cadastro-paciente" class="hidden">
+                    <input type="text" placeholder="CPF" required>
+                    <input type="text" placeholder="Nome Completo" required>
+                    <input type="tel" placeholder="Telefone" required>
+                    <select required>
+                        <option value="">Tem plano de saúde?</option>
+                        <option value="sim">Sim</option>
+                        <option value="nao">Não</option>
+                    </select>
+                    <input type="password" placeholder="Senha" required>
+                    <button type="submit">Cadastrar</button>
+                </form>
+            </div>
+
+            <!-- Formulário Médico -->
+            <div id="medico" class="tab-content hidden">
+                <form id="form-medico">
+                    <input type="text" placeholder="CRM" required>
+                    <input type="password" placeholder="Senha" required>
+                    <button type="submit">Entrar</button>
+                    <p class="cadastro-link">Não tem conta? <a href="#" onclick="mostrarCadastro('medico')">Cadastre-se</a></p>
+                </form>
+
+                <form id="cadastro-medico" class="hidden">
+                    <input type="text" placeholder="CRM" required>
+                    <input type="text" placeholder="Nome Completo" required>
+                    <select required>
+                        <option value="">Especialidade</option>
+                        <option value="cardiologia">Cardiologia</option>
+                        <option value="pediatria">Pediatria</option>
+                    </select>
+                    <input type="password" placeholder="Senha" required>
+                    <button type="submit">Cadastrar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="scripts/app.js"></script>
+    <script>
+        if (window.location.pathname.includes('index.html')) {
+            sessionStorage.removeItem('usuarioLogado');
+        }
+    </script>
+</body>
+</html>

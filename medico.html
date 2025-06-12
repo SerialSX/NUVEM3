@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Médico - Agenda Médica</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/sidebar.css">
+    <link rel="stylesheet" href="styles/medico.css">
+    <script src="https://npmcdn.com/parse/dist/parse.min.js"></script>
+    <script src="scripts/parseConfig.js"></script>
+    <script src="scripts/auth.js"></script>
+</head>
+<body>
+    <script>
+        (async function() {
+            const usuario = await checkAuth('medico');
+            if (!usuario) {
+                window.location.href = 'index.html';
+            }
+            
+            // Atualiza os dados do médico na sidebar
+            const medico = Parse.User.current();
+            if (medico) {
+                document.getElementById('medico-nome').textContent = medico.get('nome');
+                document.getElementById('medico-especialidade').textContent = medico.get('especialidade');
+            }
+        })();
+    </script>
+
+    <div class="dashboard">
+        <!-- Barra Lateral -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <img src="https://via.placeholder.com/80" alt="Foto do Médico" class="user-avatar">
+                <h3 id="medico-nome">Médico</h3>
+                <p class="especialidade" id="medico-especialidade">Especialidade</p>
+            </div>
+            
+            <ul class="sidebar-menu">
+                <li><a href="#" class="active"><i class="icon">📅</i> Agenda</a></li>
+                <li><a href="#"><i class="icon">👨‍⚕️</i> Pacientes</a></li>
+                <li><a href="#"><i class="icon">💊</i> Prescrições</a></li>
+                <li><a href="#"><i class="icon">📊</i> Relatórios</a></li>
+            </ul>
+            
+            <div class="sidebar-footer">
+                <a href="#" onclick="logout()" class="logout-btn"><i class="icon">🚪</i> Sair</a>
+            </div>
+        </div>
+
+        <!-- Conteúdo Principal -->
+        <div class="main-content">
+            <h2>Agenda do Dia</h2>
+            
+            <div class="agenda-container">
+                <div class="calendar-header">
+                    <button id="prev-day">◀</button>
+                    <h3 id="current-date">Carregando...</h3>
+                    <button id="next-day">▶</button>
+                </div>
+                
+                <div id="lista-consultas">
+                    <p class="loading">Carregando consultas...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="scripts/medico.js"></script>
+</body>
+</html>

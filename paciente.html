@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paciente - Agenda Médica</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/sidebar.css">
+    <link rel="stylesheet" href="styles/paciente.css">
+    <link rel="stylesheet" href="styles/chat.css">
+    <script src="https://npmcdn.com/parse/dist/parse.min.js"></script>
+    <script src="scripts/parseConfig.js"></script>
+    <script src="scripts/auth.js"></script>
+</head>
+<body>
+    <script>
+        (async function() {
+            const usuario = await checkAuth('paciente');
+            if (!usuario) {
+                window.location.href = 'index.html';
+            }
+            
+            // Atualiza o nome do usuário na sidebar
+            const paciente = Parse.User.current();
+            if (paciente) {
+                document.getElementById('username').textContent = paciente.get('nome');
+            }
+        })();
+    </script>
+
+    <div class="dashboard">
+        <!-- Barra Lateral -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <img src="https://via.placeholder.com/80" alt="Foto do Usuário" class="user-avatar">
+                <h3 id="username">Usuário</h3>
+            </div>
+            
+            <ul class="sidebar-menu">
+                <li><a href="#" class="active"><i class="icon">📅</i> Agendamentos</a></li>
+                <li><a href="#"><i class="icon">🏥</i> Clínicas</a></li>
+                <li><a href="#" onclick="abrirChat()"><i class="icon">💬</i> Chat</a></li>
+                <li><a href="#"><i class="icon">⚙️</i> Configurações</a></li>
+            </ul>
+            
+            <div class="sidebar-footer">
+                <a href="#" onclick="logout()" class="logout-btn"><i class="icon">🚪</i> Sair</a>
+            </div>
+        </div>
+
+        <!-- Conteúdo Principal -->
+        <div class="main-content">
+            <h2>Agendar Nova Consulta</h2>
+            
+            <form id="form-agendamento">
+                <div class="form-group">
+                    <label for="tipo-consulta">Tipo de Consulta</label>
+                    <select id="tipo-consulta" required>
+                        <option value="">Selecione...</option>
+                        <option value="clinico">Clínico Geral</option>
+                        <option value="cardiologista">Cardiologista</option>
+                        <option value="dermatologista">Dermatologista</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="data-consulta">Data e Hora</label>
+                    <input type="datetime-local" id="data-consulta" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="medico">Médico</label>
+                    <select id="medico" required>
+                        <option value="">Carregando médicos...</option>
+                    </select>
+                </div>
+                
+                <button type="submit" class="btn-primary">Agendar Consulta</button>
+            </form>
+            
+            <div class="agendamentos-list">
+                <h3>Próximas Consultas</h3>
+                <div id="lista-agendamentos">
+                    <p class="loading">Carregando agendamentos...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal do Chat -->
+    <div id="chat-modal" class="hidden">
+        <div class="chat-box">
+            <div class="chat-header">
+                <h3>Atendimento Online</h3>
+                <button onclick="fecharChat()" class="chat-close-btn">✕</button>
+            </div>
+            
+            <div id="chat-mensagens">
+                <p class="loading-chat">Carregando mensagens...</p>
+            </div>
+            
+            <div class="chat-input-area">
+                <input type="text" id="chat-input" placeholder="Digite sua mensagem...">
+                <button onclick="enviarMensagem()">Enviar</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="scripts/chat.js"></script>
+    <script src="scripts/paciente.js"></script>
+</body>
+</html>

@@ -1,0 +1,119 @@
+/* BARRA LATERAL */
+.sidebar {
+    width: 280px;
+    background: linear-gradient(135deg, #2c3e50, #34495e);
+    color: white;
+    height: 100vh;
+    position: fixed;
+    box-shadow: 2px 0 15px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    z-index: 100;
+    transition: transform 0.3s ease;
+}
+
+.sidebar-header {
+    padding: 30px 20px;
+    text-align: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.user-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 15px;
+    border: 3px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.sidebar-header h3 {
+    margin: 10px 0 5px;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.especialidade {
+    font-size: 14px;
+    color: #bdc3c7;
+    font-weight: 300;
+}
+
+.sidebar-menu {
+    list-style: none;
+    flex: 1;
+    padding: 20px 0;
+    overflow-y: auto;
+}
+
+.sidebar-menu li a {
+    display: flex;
+    align-items: center;
+    padding: 12px 25px;
+    color: #ecf0f1;
+    text-decoration: none;
+    transition: all 0.3s;
+    font-size: 15px;
+    font-weight: 500;
+}
+
+.sidebar-menu li a:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.sidebar-menu li a.active {
+    background: rgba(255, 255, 255, 0.2);
+    border-left: 4px solid #4CAF50;
+}
+
+.sidebar-menu .icon {
+    margin-right: 12px;
+    font-size: 18px;
+}
+
+.sidebar-footer {
+    padding: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.logout-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    text-decoration: none;
+    padding: 10px;
+    border-radius: 5px;
+    background: rgba(255, 255, 255, 0.1);
+    transition: background 0.3s;
+    font-weight: 500;
+}
+
+.logout-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.logout-btn .icon {
+    margin-right: 8px;
+}
+
+/* RESPONSIVIDADE */
+@media (max-width: 768px) {
+    .sidebar {
+        width: 250px;
+    }
+    
+    .sidebar-header {
+        padding: 20px 15px;
+    }
+    
+    .user-avatar {
+        width: 70px;
+        height: 70px;
+    }
+    
+    .sidebar-menu li a {
+        padding: 10px 20px;
+    }
+}
