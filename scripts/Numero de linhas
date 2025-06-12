@@ -1,0 +1,4213 @@
+index.html:
+
+
+
+<!DOCTYPE html>
+
+<html lang="pt-BR">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Agenda Médica - Login</title>
+
+    <link rel="stylesheet" href="styles/main.css">
+
+    <script src="https://npmcdn.com/parse/dist/parse.min.js"></script>
+
+    <script src="scripts/parseConfig.js"></script>
+
+</head>
+
+<body>
+
+    <div class="login-wrapper">
+
+        <div class="login-container">
+
+            <h1>Agenda Médica</h1>
+
+            
+
+            <div class="tabs">
+
+                <button class="tab-button active" onclick="openTab('paciente', event)">Paciente</button>
+
+                <button class="tab-button" onclick="openTab('medico', event)">Médico</button>
+
+            </div>
+
+
+
+            <!-- Formulário Paciente -->
+
+            <div id="paciente" class="tab-content active">
+
+                <form id="form-paciente">
+
+                    <input type="text" placeholder="CPF" required>
+
+                    <input type="password" placeholder="Senha" required>
+
+                    <button type="submit">Entrar</button>
+
+                    <p class="cadastro-link">Não tem conta? <a href="#" onclick="mostrarCadastro('paciente')">Cadastre-se</a></p>
+
+                </form>
+
+
+
+                <form id="cadastro-paciente" class="hidden">
+
+                    <input type="text" placeholder="CPF" required>
+
+                    <input type="text" placeholder="Nome Completo" required>
+
+                    <input type="tel" placeholder="Telefone" required>
+
+                    <select required>
+
+                        <option value="">Tem plano de saúde?</option>
+
+                        <option value="sim">Sim</option>
+
+                        <option value="nao">Não</option>
+
+                    </select>
+
+                    <input type="password" placeholder="Senha" required>
+
+                    <button type="submit">Cadastrar</button>
+
+                </form>
+
+            </div>
+
+
+
+            <!-- Formulário Médico -->
+
+            <div id="medico" class="tab-content hidden">
+
+                <form id="form-medico">
+
+                    <input type="text" placeholder="CRM" required>
+
+                    <input type="password" placeholder="Senha" required>
+
+                    <button type="submit">Entrar</button>
+
+                    <p class="cadastro-link">Não tem conta? <a href="#" onclick="mostrarCadastro('medico')">Cadastre-se</a></p>
+
+                </form>
+
+
+
+                <form id="cadastro-medico" class="hidden">
+
+                    <input type="text" placeholder="CRM" required>
+
+                    <input type="text" placeholder="Nome Completo" required>
+
+                    <select required>
+
+                        <option value="">Especialidade</option>
+
+                        <option value="cardiologia">Cardiologia</option>
+
+                        <option value="pediatria">Pediatria</option>
+
+                    </select>
+
+                    <input type="password" placeholder="Senha" required>
+
+                    <button type="submit">Cadastrar</button>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <script src="scripts/app.js"></script>
+
+    <script>
+
+        if (window.location.pathname.includes('index.html')) {
+
+            sessionStorage.removeItem('usuarioLogado');
+
+        }
+
+    </script>
+
+</body>
+
+</html>
+
+
+
+
+
+medico.html: 
+
+
+
+<!DOCTYPE html>
+
+<html lang="pt-BR">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Médico - Agenda Médica</title>
+
+    <link rel="stylesheet" href="styles/main.css">
+
+    <link rel="stylesheet" href="styles/sidebar.css">
+
+    <link rel="stylesheet" href="styles/medico.css">
+
+    <script src="https://npmcdn.com/parse/dist/parse.min.js"></script>
+
+    <script src="scripts/parseConfig.js"></script>
+
+    <script src="scripts/auth.js"></script>
+
+</head>
+
+<body>
+
+    <script>
+
+        (async function() {
+
+            const usuario = await checkAuth('medico');
+
+            if (!usuario) {
+
+                window.location.href = 'index.html';
+
+            }
+
+            
+
+            // Atualiza os dados do médico na sidebar
+
+            const medico = Parse.User.current();
+
+            if (medico) {
+
+                document.getElementById('medico-nome').textContent = medico.get('nome');
+
+                document.getElementById('medico-especialidade').textContent = medico.get('especialidade');
+
+            }
+
+        })();
+
+    </script>
+
+
+
+    <div class="dashboard">
+
+        <!-- Barra Lateral -->
+
+        <div class="sidebar">
+
+            <div class="sidebar-header">
+
+                <img src="https://via.placeholder.com/80" alt="Foto do Médico" class="user-avatar">
+
+                <h3 id="medico-nome">Médico</h3>
+
+                <p class="especialidade" id="medico-especialidade">Especialidade</p>
+
+            </div>
+
+            
+
+            <ul class="sidebar-menu">
+
+                <li><a href="#" class="active"><i class="icon">📅</i> Agenda</a></li>
+
+                <li><a href="#"><i class="icon">👨‍⚕️</i> Pacientes</a></li>
+
+                <li><a href="#"><i class="icon">💊</i> Prescrições</a></li>
+
+                <li><a href="#"><i class="icon">📊</i> Relatórios</a></li>
+
+            </ul>
+
+            
+
+            <div class="sidebar-footer">
+
+                <a href="#" onclick="logout()" class="logout-btn"><i class="icon">🚪</i> Sair</a>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- Conteúdo Principal -->
+
+        <div class="main-content">
+
+            <h2>Agenda do Dia</h2>
+
+            
+
+            <div class="agenda-container">
+
+                <div class="calendar-header">
+
+                    <button id="prev-day">◀</button>
+
+                    <h3 id="current-date">Carregando...</h3>
+
+                    <button id="next-day">▶</button>
+
+                </div>
+
+                
+
+                <div id="lista-consultas">
+
+                    <p class="loading">Carregando consultas...</p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <script src="scripts/medico.js"></script>
+
+</body>
+
+</html>
+
+
+
+
+
+paciente.html:
+
+
+
+<!DOCTYPE html>
+
+<html lang="pt-BR">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Paciente - Agenda Médica</title>
+
+    <link rel="stylesheet" href="styles/main.css">
+
+    <link rel="stylesheet" href="styles/sidebar.css">
+
+    <link rel="stylesheet" href="styles/paciente.css">
+
+    <link rel="stylesheet" href="styles/chat.css">
+
+    <script src="https://npmcdn.com/parse/dist/parse.min.js"></script>
+
+    <script src="scripts/parseConfig.js"></script>
+
+    <script src="scripts/auth.js"></script>
+
+</head>
+
+<body>
+
+    <script>
+
+        (async function() {
+
+            const usuario = await checkAuth('paciente');
+
+            if (!usuario) {
+
+                window.location.href = 'index.html';
+
+            }
+
+            
+
+            // Atualiza o nome do usuário na sidebar
+
+            const paciente = Parse.User.current();
+
+            if (paciente) {
+
+                document.getElementById('username').textContent = paciente.get('nome');
+
+            }
+
+        })();
+
+    </script>
+
+
+
+    <div class="dashboard">
+
+        <!-- Barra Lateral -->
+
+        <div class="sidebar">
+
+            <div class="sidebar-header">
+
+                <img src="https://via.placeholder.com/80" alt="Foto do Usuário" class="user-avatar">
+
+                <h3 id="username">Usuário</h3>
+
+            </div>
+
+            
+
+            <ul class="sidebar-menu">
+
+                <li><a href="#" class="active"><i class="icon">📅</i> Agendamentos</a></li>
+
+                <li><a href="#"><i class="icon">🏥</i> Clínicas</a></li>
+
+                <li><a href="#" onclick="abrirChat()"><i class="icon">💬</i> Chat</a></li>
+
+                <li><a href="#"><i class="icon">⚙️</i> Configurações</a></li>
+
+            </ul>
+
+            
+
+            <div class="sidebar-footer">
+
+                <a href="#" onclick="logout()" class="logout-btn"><i class="icon">🚪</i> Sair</a>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- Conteúdo Principal -->
+
+        <div class="main-content">
+
+            <h2>Agendar Nova Consulta</h2>
+
+            
+
+            <form id="form-agendamento">
+
+                <div class="form-group">
+
+                    <label for="tipo-consulta">Tipo de Consulta</label>
+
+                    <select id="tipo-consulta" required>
+
+                        <option value="">Selecione...</option>
+
+                        <option value="clinico">Clínico Geral</option>
+
+                        <option value="cardiologista">Cardiologista</option>
+
+                        <option value="dermatologista">Dermatologista</option>
+
+                    </select>
+
+                </div>
+
+                
+
+                <div class="form-group">
+
+                    <label for="data-consulta">Data e Hora</label>
+
+                    <input type="datetime-local" id="data-consulta" required>
+
+                </div>
+
+                
+
+                <div class="form-group">
+
+                    <label for="medico">Médico</label>
+
+                    <select id="medico" required>
+
+                        <option value="">Carregando médicos...</option>
+
+                    </select>
+
+                </div>
+
+                
+
+                <button type="submit" class="btn-primary">Agendar Consulta</button>
+
+            </form>
+
+            
+
+            <div class="agendamentos-list">
+
+                <h3>Próximas Consultas</h3>
+
+                <div id="lista-agendamentos">
+
+                    <p class="loading">Carregando agendamentos...</p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- Modal do Chat -->
+
+    <div id="chat-modal" class="hidden">
+
+        <div class="chat-box">
+
+            <div class="chat-header">
+
+                <h3>Atendimento Online</h3>
+
+                <button onclick="fecharChat()" class="chat-close-btn">✕</button>
+
+            </div>
+
+            
+
+            <div id="chat-mensagens">
+
+                <p class="loading-chat">Carregando mensagens...</p>
+
+            </div>
+
+            
+
+            <div class="chat-input-area">
+
+                <input type="text" id="chat-input" placeholder="Digite sua mensagem...">
+
+                <button onclick="enviarMensagem()">Enviar</button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <script src="scripts/chat.js"></script>
+
+    <script src="scripts/paciente.js"></script>
+
+</body>
+
+</html>
+
+
+
+
+
+styles/main.css:
+
+
+
+/* Reset e Configurações Globais */
+
+* {
+
+    margin: 0;
+
+    padding: 0;
+
+    box-sizing: border-box;
+
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+
+}
+
+
+
+body {
+
+    background: #f0f2f5;
+
+    color: #333;
+
+}
+
+
+
+/* Login Centralizado */
+
+.login-wrapper {
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+    min-height: 100vh;
+
+    padding: 20px;
+
+    background: linear-gradient(135deg, #6e8efb, #a777e3);
+
+}
+
+
+
+.login-container {
+
+    width: 100%;
+
+    max-width: 450px;
+
+    background: white;
+
+    border-radius: 12px;
+
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+
+    padding: 30px;
+
+    animation: fadeIn 0.4s ease-out;
+
+}
+
+
+
+@keyframes fadeIn {
+
+    from { opacity: 0; transform: translateY(-15px); }
+
+    to { opacity: 1; transform: translateY(0); }
+
+}
+
+
+
+/* Abas */
+
+.tabs {
+
+    display: flex;
+
+    margin-bottom: 20px;
+
+    border-radius: 8px;
+
+    overflow: hidden;
+
+    background: #ecf0f1;
+
+}
+
+
+
+.tab-button {
+
+    flex: 1;
+
+    padding: 12px;
+
+    border: none;
+
+    background: transparent;
+
+    cursor: pointer;
+
+    font-weight: 600;
+
+    transition: all 0.3s;
+
+}
+
+
+
+.tab-button.active {
+
+    background: #4CAF50;
+
+    color: white;
+
+}
+
+
+
+/* Formulários */
+
+.tab-content {
+
+    display: none;
+
+}
+
+
+
+.tab-content.active {
+
+    display: block;
+
+}
+
+
+
+input, select, button {
+
+    width: 100%;
+
+    padding: 12px 15px;
+
+    margin: 8px 0;
+
+    border: 1px solid #ddd;
+
+    border-radius: 6px;
+
+    font-size: 15px;
+
+}
+
+
+
+button {
+
+    background: #4CAF50;
+
+    color: white;
+
+    border: none;
+
+    cursor: pointer;
+
+    font-weight: 600;
+
+    transition: background 0.3s;
+
+}
+
+
+
+button:hover {
+
+    background: #3d8b40;
+
+}
+
+
+
+.cadastro-link {
+
+    text-align: center;
+
+    margin-top: 15px;
+
+    color: #7f8c8d;
+
+}
+
+
+
+.cadastro-link a {
+
+    color: #4CAF50;
+
+    text-decoration: none;
+
+    font-weight: 500;
+
+}
+
+
+
+.hidden {
+
+    display: none;
+
+}
+
+
+
+/* Responsividade */
+
+@media (max-width: 480px) {
+
+    .login-container {
+
+        padding: 20px;
+
+    }
+
+    
+
+    .tab-button {
+
+        padding: 10px;
+
+        font-size: 14px;
+
+    }
+
+}
+
+
+
+
+
+styles/chat.css:
+
+
+
+/* MODAL DO CHAT */
+
+#chat-modal {
+
+    position: fixed;
+
+    top: 0;
+
+    left: 0;
+
+    width: 100%;
+
+    height: 100%;
+
+    background: rgba(0, 0, 0, 0.7);
+
+    display: none;
+
+    justify-content: center;
+
+    align-items: center;
+
+    z-index: 2000;
+
+    padding: 20px;
+
+    box-sizing: border-box;
+
+}
+
+
+
+/* CAIXA DO CHAT */
+
+.chat-box {
+
+    width: 100%;
+
+    max-width: 400px;
+
+    height: 70vh;
+
+    max-height: 600px;
+
+    background: white;
+
+    border-radius: 12px;
+
+    overflow: hidden;
+
+    display: flex;
+
+    flex-direction: column;
+
+    box-shadow: 0 5px 30px rgba(0, 0, 0, 0.2);
+
+    animation: chatFadeIn 0.3s ease-out;
+
+}
+
+
+
+@keyframes chatFadeIn {
+
+    from { opacity: 0; transform: translateY(20px); }
+
+    to { opacity: 1; transform: translateY(0); }
+
+}
+
+
+
+/* CABEÇALHO */
+
+.chat-header {
+
+    background: #4CAF50;
+
+    color: white;
+
+    padding: 15px 20px;
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    position: relative;
+
+}
+
+
+
+.chat-header h3 {
+
+    margin: 0;
+
+    font-size: 16px;
+
+    font-weight: 600;
+
+    flex: 1;
+
+    text-align: center;
+
+}
+
+
+
+.chat-close-btn {
+
+    background: none;
+
+    border: none;
+
+    color: white;
+
+    font-size: 16px;
+
+    cursor: pointer;
+
+    padding: 5px;
+
+    transition: transform 0.2s;
+
+    position: absolute;
+
+    right: 10px;
+
+    top: 50%;
+
+    transform: translateY(-50%);
+
+    width: 24px;
+
+    height: 24px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    border-radius: 50%;
+
+}
+
+
+
+.chat-close-btn:hover {
+
+    background: rgba(255, 255, 255, 0.2);
+
+    transform: translateY(-50%) scale(1.1);
+
+}
+
+
+
+/* ÁREA DE MENSAGENS */
+
+#chat-mensagens {
+
+    flex: 1;
+
+    padding: 15px;
+
+    overflow-y: auto;
+
+    background: #f5f5f5;
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 10px;
+
+}
+
+
+
+/* ESTILOS DAS MENSAGENS */
+
+.mensagem {
+
+    max-width: 85%;
+
+    padding: 10px;
+
+    border-radius: 12px;
+
+    position: relative;
+
+    animation: messageFadeIn 0.3s ease-out;
+
+    font-size: 14px;
+
+    line-height: 1.4;
+
+}
+
+
+
+@keyframes messageFadeIn {
+
+    from { opacity: 0; transform: translateY(10px); }
+
+    to { opacity: 1; transform: translateY(0); }
+
+}
+
+
+
+.mensagem-conteudo {
+
+    display: flex;
+
+    flex-direction: column;
+
+}
+
+
+
+.mensagem.usuario {
+
+    background: #4CAF50;
+
+    color: white;
+
+    margin-left: auto;
+
+    border-bottom-right-radius: 4px;
+
+}
+
+
+
+.mensagem.atendente {
+
+    background: white;
+
+    color: #333;
+
+    margin-right: auto;
+
+    border-bottom-left-radius: 4px;
+
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+
+}
+
+
+
+.hora-mensagem {
+
+    font-size: 11px;
+
+    opacity: 0.8;
+
+    margin-top: 4px;
+
+    align-self: flex-end;
+
+}
+
+
+
+/* ÁREA DE INPUT */
+
+.chat-input-area {
+
+    display: flex;
+
+    padding: 12px;
+
+    background: white;
+
+    border-top: 1px solid #eee;
+
+    align-items: center;
+
+}
+
+
+
+#chat-input {
+
+    flex: 1;
+
+    padding: 10px 15px;
+
+    border: 1px solid #ddd;
+
+    border-radius: 20px;
+
+    outline: none;
+
+    font-size: 14px;
+
+    transition: border-color 0.3s;
+
+}
+
+
+
+#chat-input:focus {
+
+    border-color: #4CAF50;
+
+}
+
+
+
+.chat-input-area button {
+
+    margin-left: 8px;
+
+    padding: 8px 16px;
+
+    border-radius: 20px;
+
+    background: #4CAF50;
+
+    color: white;
+
+    border: none;
+
+    cursor: pointer;
+
+    font-size: 14px;
+
+    transition: background 0.3s;
+
+}
+
+
+
+.chat-input-area button:hover {
+
+    background: #3d8b40;
+
+}
+
+
+
+/* RESPONSIVIDADE */
+
+@media (max-width: 480px) {
+
+    .chat-box {
+
+        height: 85vh;
+
+        max-height: none;
+
+        border-radius: 0;
+
+    }
+
+    
+
+    #chat-modal {
+
+        padding: 0;
+
+    }
+
+    
+
+    .mensagem {
+
+        max-width: 90%;
+
+    }
+
+    
+
+    .chat-header {
+
+        padding: 12px;
+
+    }
+
+    
+
+    .chat-header h3 {
+
+        font-size: 15px;
+
+    }
+
+    
+
+    .chat-close-btn {
+
+        right: 8px;
+
+    }
+
+}
+
+
+
+styles/medico.css:
+
+
+
+/* ESTILOS GERAIS PARA A PÁGINA DO MÉDICO */
+
+.dashboard {
+
+    display: flex;
+
+    min-height: 100vh;
+
+    overflow-x: hidden;
+
+    background-color: #f5f7fa;
+
+}
+
+
+
+/* CONTEÚDO PRINCIPAL */
+
+.main-content {
+
+    flex: 1;
+
+    margin-left: 280px; /* Largura da sidebar */
+
+    padding: 30px;
+
+    transition: margin-left 0.3s ease;
+
+    min-height: 100vh;
+
+    background-color: #f5f7fa;
+
+}
+
+
+
+/* CABEÇALHO DA AGENDA */
+
+.agenda-container {
+
+    background: white;
+
+    padding: 30px;
+
+    border-radius: 12px;
+
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+
+}
+
+
+
+.calendar-header {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    margin-bottom: 25px;
+
+    padding-bottom: 15px;
+
+    border-bottom: 1px solid #eee;
+
+}
+
+
+
+.calendar-header h3 {
+
+    font-size: 20px;
+
+    color: #2c3e50;
+
+    font-weight: 600;
+
+    margin: 0;
+
+}
+
+
+
+.calendar-header button {
+
+    background: none;
+
+    border: none;
+
+    font-size: 22px;
+
+    cursor: pointer;
+
+    color: #4CAF50;
+
+    padding: 5px 15px;
+
+    border-radius: 5px;
+
+    transition: background 0.3s;
+
+}
+
+
+
+.calendar-header button:hover {
+
+    background: rgba(76, 175, 80, 0.1);
+
+}
+
+
+
+/* LISTA DE CONSULTAS */
+
+#lista-consultas {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 15px;
+
+}
+
+
+
+.consulta-item {
+
+    display: flex;
+
+    align-items: center;
+
+    padding: 20px;
+
+    background: #f9f9f9;
+
+    border-radius: 10px;
+
+    transition: all 0.3s;
+
+    border-left: 4px solid #4CAF50;
+
+}
+
+
+
+.consulta-item:hover {
+
+    transform: translateY(-2px);
+
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+
+}
+
+
+
+.consulta-horario {
+
+    font-weight: 600;
+
+    color: #4CAF50;
+
+    min-width: 80px;
+
+    font-size: 15px;
+
+}
+
+
+
+.consulta-info {
+
+    flex: 1;
+
+    padding: 0 20px;
+
+}
+
+
+
+.consulta-info h4 {
+
+    margin-bottom: 5px;
+
+    color: #2c3e50;
+
+    font-size: 16px;
+
+}
+
+
+
+.consulta-info p {
+
+    color: #7f8c8d;
+
+    font-size: 14px;
+
+}
+
+
+
+.observacao {
+
+    font-style: italic;
+
+    color: #e67e22 !important;
+
+    margin-top: 5px;
+
+    font-size: 13px;
+
+}
+
+
+
+.status {
+
+    font-weight: 600;
+
+    font-size: 13px;
+
+    padding: 3px 8px;
+
+    border-radius: 4px;
+
+    background: #e8f5e9;
+
+    color: #4CAF50;
+
+    display: inline-block;
+
+}
+
+
+
+.consulta-actions {
+
+    display: flex;
+
+    gap: 10px;
+
+}
+
+
+
+.btn-confirm, .btn-cancel {
+
+    border: none;
+
+    width: 40px;
+
+    height: 40px;
+
+    border-radius: 50%;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    cursor: pointer;
+
+    font-size: 18px;
+
+    transition: transform 0.3s;
+
+}
+
+
+
+.btn-confirm {
+
+    background: #4CAF50;
+
+    color: white;
+
+}
+
+
+
+.btn-cancel {
+
+    background: #e74c3c;
+
+    color: white;
+
+}
+
+
+
+.btn-confirm:hover, .btn-cancel:hover {
+
+    transform: scale(1.1);
+
+}
+
+
+
+/* MENSAGENS DE ESTADO */
+
+.empty-message, .loading, .error-message {
+
+    text-align: center;
+
+    padding: 40px;
+
+    color: #7f8c8d;
+
+    font-size: 16px;
+
+}
+
+
+
+.error-message {
+
+    color: #e74c3c;
+
+}
+
+
+
+/* BOTÃO DE MENU PARA MOBILE */
+
+.menu-toggle {
+
+    position: fixed;
+
+    top: 15px;
+
+    left: 15px;
+
+    z-index: 1100;
+
+    font-size: 24px;
+
+    cursor: pointer;
+
+    color: white;
+
+    background: #4CAF50;
+
+    width: 40px;
+
+    height: 40px;
+
+    border-radius: 50%;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+
+    display: none;
+
+}
+
+
+
+/* RESPONSIVIDADE */
+
+@media (max-width: 1200px) {
+
+    .consulta-item {
+
+        flex-wrap: wrap;
+
+    }
+
+    
+
+    .consulta-actions {
+
+        width: 100%;
+
+        justify-content: flex-end;
+
+        margin-top: 15px;
+
+    }
+
+}
+
+
+
+@media (max-width: 992px) {
+
+    .sidebar {
+
+        transform: translateX(-100%);
+
+        transition: transform 0.3s ease;
+
+        position: fixed;
+
+        height: 100vh;
+
+    }
+
+    
+
+    .sidebar.active {
+
+        transform: translateX(0);
+
+    }
+
+    
+
+    .main-content {
+
+        margin-left: 0;
+
+        padding: 80px 20px 30px;
+
+    }
+
+    
+
+    .menu-toggle {
+
+        display: flex;
+
+    }
+
+}
+
+
+
+@media (max-width: 768px) {
+
+    .consulta-item {
+
+        flex-direction: column;
+
+        align-items: flex-start;
+
+    }
+
+    
+
+    .consulta-info {
+
+        padding: 15px 0;
+
+        width: 100%;
+
+    }
+
+    
+
+    .consulta-actions {
+
+        justify-content: flex-start;
+
+        width: 100%;
+
+    }
+
+    
+
+    .agenda-container {
+
+        padding: 20px;
+
+    }
+
+}
+
+
+
+@media (max-width: 480px) {
+
+    .main-content {
+
+        padding: 70px 15px 20px;
+
+    }
+
+    
+
+    .agenda-container {
+
+        padding: 15px;
+
+    }
+
+    
+
+    .calendar-header h3 {
+
+        font-size: 18px;
+
+    }
+
+}
+
+
+
+
+
+styles/paciente.css:
+
+
+
+/* ESTILOS GERAIS PARA A PÁGINA DO PACIENTE */
+
+.dashboard {
+
+    display: flex;
+
+    min-height: 100vh;
+
+    overflow-x: hidden;
+
+    background-color: #f5f7fa;
+
+}
+
+
+
+/* BARRA LATERAL - Definida no sidebar.css */
+
+
+
+/* CONTEÚDO PRINCIPAL */
+
+.main-content {
+
+    flex: 1;
+
+    margin-left: 280px; /* Largura da sidebar */
+
+    padding: 30px;
+
+    transition: margin-left 0.3s ease;
+
+    min-height: 100vh;
+
+    background-color: #f5f7fa;
+
+}
+
+
+
+/* FORMULÁRIO DE AGENDAMENTO */
+
+#form-agendamento {
+
+    background: white;
+
+    padding: 30px;
+
+    border-radius: 12px;
+
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+
+    margin-bottom: 30px;
+
+}
+
+
+
+.form-group {
+
+    margin-bottom: 20px;
+
+}
+
+
+
+.form-group label {
+
+    display: block;
+
+    margin-bottom: 8px;
+
+    font-weight: 600;
+
+    color: #2c3e50;
+
+    font-size: 14px;
+
+}
+
+
+
+.form-group input,
+
+.form-group select {
+
+    width: 100%;
+
+    padding: 12px 15px;
+
+    border: 1px solid #e0e0e0;
+
+    border-radius: 8px;
+
+    font-size: 15px;
+
+    transition: border-color 0.3s;
+
+}
+
+
+
+.form-group input:focus,
+
+.form-group select:focus {
+
+    border-color: #4CAF50;
+
+    outline: none;
+
+}
+
+
+
+/* LISTA DE AGENDAMENTOS */
+
+.agendamentos-list {
+
+    background: white;
+
+    padding: 30px;
+
+    border-radius: 12px;
+
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+
+}
+
+
+
+.agendamentos-list h3 {
+
+    margin-bottom: 20px;
+
+    color: #2c3e50;
+
+    font-size: 20px;
+
+}
+
+
+
+.agendamento-item {
+
+    display: flex;
+
+    align-items: center;
+
+    padding: 20px;
+
+    margin-bottom: 15px;
+
+    background: #f9f9f9;
+
+    border-radius: 10px;
+
+    transition: all 0.3s;
+
+    border-left: 4px solid #4CAF50;
+
+}
+
+
+
+.agendamento-item:hover {
+
+    transform: translateY(-2px);
+
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+
+}
+
+
+
+.agendamento-data {
+
+    font-weight: 600;
+
+    color: #4CAF50;
+
+    min-width: 200px;
+
+    font-size: 15px;
+
+}
+
+
+
+.agendamento-info {
+
+    flex: 1;
+
+    padding: 0 20px;
+
+}
+
+
+
+.agendamento-info h4 {
+
+    margin-bottom: 5px;
+
+    color: #2c3e50;
+
+    font-size: 16px;
+
+}
+
+
+
+.agendamento-info p {
+
+    color: #7f8c8d;
+
+    font-size: 14px;
+
+}
+
+
+
+.status {
+
+    font-weight: 600;
+
+    font-size: 13px;
+
+    padding: 3px 8px;
+
+    border-radius: 4px;
+
+    background: #e8f5e9;
+
+    color: #4CAF50;
+
+    display: inline-block;
+
+}
+
+
+
+.btn-cancel {
+
+    background: #e74c3c;
+
+    color: white;
+
+    border: none;
+
+    padding: 10px 20px;
+
+    border-radius: 6px;
+
+    cursor: pointer;
+
+    font-weight: 600;
+
+    transition: background 0.3s;
+
+}
+
+
+
+.btn-cancel:hover {
+
+    background: #c0392b;
+
+}
+
+
+
+/* MENSAGENS DE ESTADO */
+
+.loading, .empty, .error {
+
+    text-align: center;
+
+    padding: 40px;
+
+    color: #7f8c8d;
+
+    font-size: 16px;
+
+}
+
+
+
+.error {
+
+    color: #e74c3c;
+
+}
+
+
+
+/* BOTÃO DE MENU PARA MOBILE */
+
+.menu-toggle {
+
+    position: fixed;
+
+    top: 15px;
+
+    left: 15px;
+
+    z-index: 1100;
+
+    font-size: 24px;
+
+    cursor: pointer;
+
+    color: white;
+
+    background: #4CAF50;
+
+    width: 40px;
+
+    height: 40px;
+
+    border-radius: 50%;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+
+    display: none;
+
+}
+
+
+
+/* RESPONSIVIDADE */
+
+@media (max-width: 1200px) {
+
+    .agendamento-data {
+
+        min-width: 180px;
+
+    }
+
+}
+
+
+
+@media (max-width: 992px) {
+
+    .sidebar {
+
+        transform: translateX(-100%);
+
+        transition: transform 0.3s ease;
+
+        position: fixed;
+
+        height: 100vh;
+
+    }
+
+    
+
+    .sidebar.active {
+
+        transform: translateX(0);
+
+    }
+
+    
+
+    .main-content {
+
+        margin-left: 0;
+
+        padding: 80px 20px 30px;
+
+    }
+
+    
+
+    .menu-toggle {
+
+        display: flex;
+
+    }
+
+}
+
+
+
+@media (max-width: 768px) {
+
+    .agendamento-item {
+
+        flex-direction: column;
+
+        align-items: flex-start;
+
+    }
+
+    
+
+    .agendamento-data {
+
+        min-width: 100%;
+
+        margin-bottom: 10px;
+
+    }
+
+    
+
+    .agendamento-info {
+
+        padding: 15px 0;
+
+        width: 100%;
+
+    }
+
+    
+
+    .btn-cancel {
+
+        align-self: flex-end;
+
+        margin-top: 10px;
+
+    }
+
+    
+
+    #form-agendamento, 
+
+    .agendamentos-list {
+
+        padding: 20px;
+
+    }
+
+}
+
+
+
+@media (max-width: 480px) {
+
+    .main-content {
+
+        padding: 70px 15px 20px;
+
+    }
+
+    
+
+    #form-agendamento, 
+
+    .agendamentos-list {
+
+        padding: 15px;
+
+    }
+
+}
+
+
+
+
+
+styles/sidebar.css:
+
+
+
+/* BARRA LATERAL */
+
+.sidebar {
+
+    width: 280px;
+
+    background: linear-gradient(135deg, #2c3e50, #34495e);
+
+    color: white;
+
+    height: 100vh;
+
+    position: fixed;
+
+    box-shadow: 2px 0 15px rgba(0, 0, 0, 0.1);
+
+    display: flex;
+
+    flex-direction: column;
+
+    z-index: 100;
+
+    transition: transform 0.3s ease;
+
+}
+
+
+
+.sidebar-header {
+
+    padding: 30px 20px;
+
+    text-align: center;
+
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+
+}
+
+
+
+.user-avatar {
+
+    width: 80px;
+
+    height: 80px;
+
+    border-radius: 50%;
+
+    object-fit: cover;
+
+    margin-bottom: 15px;
+
+    border: 3px solid rgba(255, 255, 255, 0.2);
+
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+
+}
+
+
+
+.sidebar-header h3 {
+
+    margin: 10px 0 5px;
+
+    font-size: 18px;
+
+    font-weight: 600;
+
+}
+
+
+
+.especialidade {
+
+    font-size: 14px;
+
+    color: #bdc3c7;
+
+    font-weight: 300;
+
+}
+
+
+
+.sidebar-menu {
+
+    list-style: none;
+
+    flex: 1;
+
+    padding: 20px 0;
+
+    overflow-y: auto;
+
+}
+
+
+
+.sidebar-menu li a {
+
+    display: flex;
+
+    align-items: center;
+
+    padding: 12px 25px;
+
+    color: #ecf0f1;
+
+    text-decoration: none;
+
+    transition: all 0.3s;
+
+    font-size: 15px;
+
+    font-weight: 500;
+
+}
+
+
+
+.sidebar-menu li a:hover {
+
+    background: rgba(255, 255, 255, 0.1);
+
+}
+
+
+
+.sidebar-menu li a.active {
+
+    background: rgba(255, 255, 255, 0.2);
+
+    border-left: 4px solid #4CAF50;
+
+}
+
+
+
+.sidebar-menu .icon {
+
+    margin-right: 12px;
+
+    font-size: 18px;
+
+}
+
+
+
+.sidebar-footer {
+
+    padding: 20px;
+
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+
+}
+
+
+
+.logout-btn {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    color: white;
+
+    text-decoration: none;
+
+    padding: 10px;
+
+    border-radius: 5px;
+
+    background: rgba(255, 255, 255, 0.1);
+
+    transition: background 0.3s;
+
+    font-weight: 500;
+
+}
+
+
+
+.logout-btn:hover {
+
+    background: rgba(255, 255, 255, 0.2);
+
+}
+
+
+
+.logout-btn .icon {
+
+    margin-right: 8px;
+
+}
+
+
+
+/* RESPONSIVIDADE */
+
+@media (max-width: 768px) {
+
+    .sidebar {
+
+        width: 250px;
+
+    }
+
+    
+
+    .sidebar-header {
+
+        padding: 20px 15px;
+
+    }
+
+    
+
+    .user-avatar {
+
+        width: 70px;
+
+        height: 70px;
+
+    }
+
+    
+
+    .sidebar-menu li a {
+
+        padding: 10px 20px;
+
+    }
+
+}
+
+
+
+scripts/app.js:
+
+
+
+// Funções de UI
+
+function openTab(tabName, event) {
+
+    document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+
+    document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+
+    document.getElementById(tabName).classList.add('active');
+
+    event.currentTarget.classList.add('active');
+
+}
+
+
+
+function mostrarCadastro(tipo) {
+
+    document.getElementById(`form-${tipo}`).classList.toggle('hidden');
+
+    document.getElementById(`cadastro-${tipo}`).classList.toggle('hidden');
+
+}
+
+
+
+// Cadastro de Paciente
+
+document.getElementById('cadastro-paciente').addEventListener('submit', async function(e) {
+
+    e.preventDefault();
+
+    const form = e.target;
+
+    
+
+    try {
+
+        // Criar usuário
+
+        const user = new Parse.User();
+
+        user.set('username', form[0].value); // CPF
+
+        user.set('password', form[4].value);
+
+        user.set('email', `${form[0].value}@paciente.com`);
+
+        
+
+        // Criar paciente
+
+        const Paciente = Parse.Object.extend('Paciente');
+
+        const paciente = new Paciente();
+
+        paciente.set('cpf', form[0].value);
+
+        paciente.set('nome', form[1].value);
+
+        paciente.set('telefone', form[2].value);
+
+        paciente.set('plano', form[3].value === 'sim');
+
+        
+
+        await user.signUp();
+
+        paciente.set('user', user);
+
+        await paciente.save();
+
+        
+
+        alert('Cadastro realizado com sucesso!');
+
+        form.reset();
+
+        mostrarCadastro('paciente');
+
+    } catch (error) {
+
+        console.error('Erro no cadastro:', error);
+
+        alert(`Erro: ${error.message}`);
+
+    }
+
+});
+
+
+
+// Cadastro de Médico
+
+document.getElementById('cadastro-medico').addEventListener('submit', async function(e) {
+
+    e.preventDefault();
+
+    const form = e.target;
+
+    
+
+    try {
+
+        // Criar usuário
+
+        const user = new Parse.User();
+
+        user.set('username', form[0].value); // CRM
+
+        user.set('password', form[3].value);
+
+        user.set('email', `${form[0].value}@medico.com`);
+
+        
+
+        // Criar médico
+
+        const Medico = Parse.Object.extend('Medico');
+
+        const medico = new Medico();
+
+        medico.set('crm', form[0].value);
+
+        medico.set('nome', form[1].value);
+
+        medico.set('especialidade', form[2].value);
+
+        medico.set('ativo', true);
+
+        
+
+        await user.signUp();
+
+        medico.set('user', user);
+
+        await medico.save();
+
+        
+
+        alert('Cadastro médico realizado!');
+
+        form.reset();
+
+        mostrarCadastro('medico');
+
+    } catch (error) {
+
+        console.error('Erro no cadastro médico:', error);
+
+        alert(`Erro: ${error.message}`);
+
+    }
+
+});
+
+
+
+// Login
+
+async function fazerLogin(username, password) {
+
+    const user = await Parse.User.logIn(username, password);
+
+    
+
+    // Verificar se é médico
+
+    const Medico = Parse.Object.extend('Medico');
+
+    const query = new Parse.Query(Medico);
+
+    query.equalTo('user', user);
+
+    const medico = await query.first();
+
+    
+
+    if (medico) {
+
+        return { tipo: 'medico', user, dados: medico };
+
+    } else {
+
+        // Verificar se é paciente
+
+        const Paciente = Parse.Object.extend('Paciente');
+
+        const pacienteQuery = new Parse.Query(Paciente);
+
+        pacienteQuery.equalTo('cpf', username);
+
+        const paciente = await pacienteQuery.first();
+
+        
+
+        if (paciente) {
+
+            return { tipo: 'paciente', user, dados: paciente };
+
+        }
+
+    }
+
+    
+
+    throw new Error('Tipo de usuário não identificado');
+
+}
+
+
+
+// Login Paciente
+
+document.getElementById('form-paciente').addEventListener('submit', async function(e) {
+
+    e.preventDefault();
+
+    try {
+
+        const { tipo, user, dados } = await fazerLogin(e.target[0].value, e.target[1].value);
+
+        if (tipo !== 'paciente') throw new Error('Acesso permitido apenas para pacientes');
+
+        
+
+        sessionStorage.setItem('usuarioLogado', JSON.stringify({
+
+            id: user.id,
+
+            tipo: 'paciente',
+
+            nome: dados.get('nome'),
+
+            cpf: dados.get('cpf')
+
+        }));
+
+        
+
+        window.location.href = 'paciente.html';
+
+    } catch (error) {
+
+        alert(error.message);
+
+    }
+
+});
+
+
+
+// Login Médico
+
+document.getElementById('form-medico').addEventListener('submit', async function(e) {
+
+    e.preventDefault();
+
+    try {
+
+        const { tipo, user, dados } = await fazerLogin(e.target[0].value, e.target[1].value);
+
+        if (tipo !== 'medico') throw new Error('Acesso permitido apenas para médicos');
+
+        
+
+        sessionStorage.setItem('usuarioLogado', JSON.stringify({
+
+            id: user.id,
+
+            tipo: 'medico',
+
+            nome: dados.get('nome'),
+
+            crm: dados.get('crm'),
+
+            especialidade: dados.get('especialidade')
+
+        }));
+
+        
+
+        window.location.href = 'medico.html';
+
+    } catch (error) {
+
+        alert(error.message);
+
+    }
+
+});
+
+
+
+// Exporta funções globais
+
+window.openTab = openTab;
+
+window.mostrarCadastro = mostrarCadastro;
+
+
+
+
+
+scripts/auth.js:
+
+
+
+async function checkAuth(requiredType) {
+
+    try {
+
+        const currentUser = Parse.User.current();
+
+        if (!currentUser) throw new Error('Nenhum usuário logado');
+
+        
+
+        // Verificar sessão
+
+        await currentUser.fetch();
+
+        
+
+        // Buscar dados específicos
+
+        if (requiredType === 'medico') {
+
+            const Medico = Parse.Object.extend('Medico');
+
+            const query = new Parse.Query(Medico);
+
+            query.equalTo('user', currentUser);
+
+            const medico = await query.first();
+
+            
+
+            if (!medico) throw new Error('Acesso restrito a médicos');
+
+            
+
+            return {
+
+                user: currentUser,
+
+                tipo: 'medico',
+
+                dados: medico
+
+            };
+
+        } else if (requiredType === 'paciente') {
+
+            const Paciente = Parse.Object.extend('Paciente');
+
+            const query = new Parse.Query(Paciente);
+
+            query.equalTo('user', currentUser);
+
+            const paciente = await query.first();
+
+            
+
+            if (!paciente) throw new Error('Acesso restrito a pacientes');
+
+            
+
+            return {
+
+                user: currentUser,
+
+                tipo: 'paciente',
+
+                dados: paciente
+
+            };
+
+        }
+
+        
+
+        throw new Error('Tipo de usuário não especificado');
+
+    } catch (error) {
+
+        console.error('Erro na autenticação:', error);
+
+        await logout();
+
+        throw error;
+
+    }
+
+}
+
+
+
+async function logout() {
+
+    try {
+
+        await Parse.User.logOut();
+
+        sessionStorage.removeItem('usuarioLogado');
+
+        window.location.href = 'index.html';
+
+    } catch (error) {
+
+        console.error('Erro ao fazer logout:', error);
+
+    }
+
+}
+
+
+
+// Verificação periódica da sessão
+
+setInterval(async () => {
+
+    const user = Parse.User.current();
+
+    if (user) {
+
+        try {
+
+            await user.fetch();
+
+        } catch (e) {
+
+            await logout();
+
+        }
+
+    }
+
+}, 5 * 60 * 1000); // 5 minutos
+
+
+
+// Exporta para módulos
+
+if (typeof module !== 'undefined' && module.exports) {
+
+    module.exports = { checkAuth, logout };
+
+}
+
+
+
+
+
+scripts/chat.js:
+
+
+
+let chatAberto = false;
+
+let chatAtivo = null;
+
+
+
+document.addEventListener('DOMContentLoaded', async function() {
+
+    await carregarHistoricoChat();
+
+    
+
+    document.addEventListener('keydown', function(e) {
+
+        if (e.key === 'Escape' && chatAberto) {
+
+            fecharChat();
+
+        }
+
+    });
+
+});
+
+
+
+async function carregarHistoricoChat() {
+
+    const chatMensagens = document.getElementById('chat-mensagens');
+
+    chatMensagens.innerHTML = '<p class="loading-chat">Carregando mensagens...</p>';
+
+    
+
+    try {
+
+        const paciente = await getPacienteAtual();
+
+        if (!paciente) throw new Error('Paciente não encontrado');
+
+        
+
+        const mensagens = await buscarMensagens(paciente.id);
+
+        
+
+        chatMensagens.innerHTML = '';
+
+        
+
+        if (mensagens.length === 0) {
+
+            chatMensagens.innerHTML = '<p class="empty-chat">Nenhuma mensagem ainda. Inicie a conversa!</p>';
+
+            return;
+
+        }
+
+        
+
+        for (const msg of mensagens) {
+
+            renderMensagem({
+
+                texto: msg.get('texto'),
+
+                tipo: msg.get('tipo'),
+
+                hora: formatarHora(msg.createdAt)
+
+            });
+
+        }
+
+        
+
+        rolarParaUltimaMensagem();
+
+    } catch (error) {
+
+        console.error('Erro ao carregar chat:', error);
+
+        chatMensagens.innerHTML = '<p class="error-chat">Erro ao carregar mensagens</p>';
+
+    }
+
+}
+
+
+
+async function getPacienteAtual() {
+
+    try {
+
+        const Paciente = Parse.Object.extend('Paciente');
+
+        const query = new Parse.Query(Paciente);
+
+        query.equalTo('user', Parse.User.current());
+
+        return await query.first();
+
+    } catch (error) {
+
+        console.error('Erro ao buscar paciente:', error);
+
+        return null;
+
+    }
+
+}
+
+
+
+async function buscarMensagens(pacienteId) {
+
+    try {
+
+        const Chat = Parse.Object.extend('Chat');
+
+        const query = new Parse.Query(Chat);
+
+        query.equalTo('pacienteId', pacienteId);
+
+        query.ascending('createdAt');
+
+        query.limit(100);
+
+        return await query.find();
+
+    } catch (error) {
+
+        console.error('Erro ao buscar mensagens:', error);
+
+        return [];
+
+    }
+
+}
+
+
+
+function abrirChat() {
+
+    if (chatAberto) return;
+
+    
+
+    const chatModal = document.getElementById('chat-modal');
+
+    chatModal.style.display = 'flex';
+
+    document.getElementById('chat-input').focus();
+
+    chatAberto = true;
+
+    
+
+    rolarParaUltimaMensagem();
+
+    iniciarChatAtendente();
+
+}
+
+
+
+function fecharChat() {
+
+    document.getElementById('chat-modal').style.display = 'none';
+
+    chatAberto = false;
+
+    
+
+    if (chatAtivo) {
+
+        clearInterval(chatAtivo);
+
+        chatAtivo = null;
+
+    }
+
+}
+
+
+
+function rolarParaUltimaMensagem() {
+
+    const chatMensagens = document.getElementById('chat-mensagens');
+
+    chatMensagens.scrollTop = chatMensagens.scrollHeight;
+
+}
+
+
+
+function iniciarChatAtendente() {
+
+    if (!chatAtivo) {
+
+        chatAtivo = setInterval(async () => {
+
+            try {
+
+                const paciente = await getPacienteAtual();
+
+                if (!paciente) return;
+
+                
+
+                const mensagensNaoLidas = await buscarMensagensNaoLidas(paciente.id);
+
+                
+
+                for (const msg of mensagensNaoLidas) {
+
+                    renderMensagem({
+
+                        texto: msg.get('texto'),
+
+                        tipo: 'atendente',
+
+                        hora: formatarHora(msg.createdAt)
+
+                    });
+
+                    msg.set('lida', true);
+
+                    await msg.save();
+
+                }
+
+                
+
+                if (mensagensNaoLidas.length > 0) {
+
+                    rolarParaUltimaMensagem();
+
+                }
+
+            } catch (error) {
+
+                console.error('Erro ao verificar mensagens:', error);
+
+            }
+
+        }, 3000);
+
+    }
+
+}
+
+
+
+async function buscarMensagensNaoLidas(pacienteId) {
+
+    try {
+
+        const Chat = Parse.Object.extend('Chat');
+
+        const query = new Parse.Query(Chat);
+
+        query.equalTo('pacienteId', pacienteId);
+
+        query.equalTo('lida', false);
+
+        query.equalTo('tipo', 'atendente');
+
+        return await query.find();
+
+    } catch (error) {
+
+        console.error('Erro ao buscar mensagens não lidas:', error);
+
+        return [];
+
+    }
+
+}
+
+
+
+function formatarHora(data) {
+
+    return new Date(data).toLocaleTimeString('pt-BR', { 
+
+        hour: '2-digit', 
+
+        minute: '2-digit',
+
+        hour12: false
+
+    });
+
+}
+
+
+
+async function enviarMensagem() {
+
+    const input = document.getElementById('chat-input');
+
+    const texto = input.value.trim();
+
+    
+
+    if (!texto) return;
+
+    
+
+    try {
+
+        const paciente = await getPacienteAtual();
+
+        if (!paciente) throw new Error('Paciente não encontrado');
+
+        
+
+        await salvarMensagem(paciente.id, texto);
+
+        
+
+        renderMensagem({
+
+            texto: texto,
+
+            tipo: 'usuario',
+
+            hora: formatarHora(new Date())
+
+        });
+
+        
+
+        input.value = '';
+
+        rolarParaUltimaMensagem();
+
+        
+
+        // Simular resposta do atendente
+
+        setTimeout(async () => {
+
+            try {
+
+                await salvarMensagem(
+
+                    paciente.id, 
+
+                    'Recebemos sua mensagem. Um atendente responderá em breve.', 
+
+                    'atendente', 
+
+                    false
+
+                );
+
+            } catch (error) {
+
+                console.error('Erro ao enviar resposta automática:', error);
+
+            }
+
+        }, 1000);
+
+    } catch (error) {
+
+        console.error('Erro ao enviar mensagem:', error);
+
+        showAlert('error', 'Erro ao enviar mensagem: ' + error.message);
+
+    }
+
+}
+
+
+
+async function salvarMensagem(pacienteId, texto, tipo = 'usuario', lida = true) {
+
+    try {
+
+        const Chat = Parse.Object.extend('Chat');
+
+        const mensagem = new Chat();
+
+        mensagem.set('pacienteId', pacienteId);
+
+        mensagem.set('texto', texto);
+
+        mensagem.set('tipo', tipo);
+
+        mensagem.set('lida', lida);
+
+        return await mensagem.save();
+
+    } catch (error) {
+
+        console.error('Erro ao salvar mensagem:', error);
+
+        throw error;
+
+    }
+
+}
+
+
+
+function renderMensagem({ texto, tipo, hora }) {
+
+    const chatMensagens = document.getElementById('chat-mensagens');
+
+    
+
+    // Limpa mensagens de estado se existirem
+
+    if (chatMensagens.querySelector('.loading-chat, .empty-chat, .error-chat')) {
+
+        chatMensagens.innerHTML = '';
+
+    }
+
+    
+
+    const divMensagem = document.createElement('div');
+
+    divMensagem.className = `mensagem ${tipo}`;
+
+    
+
+    divMensagem.innerHTML = `
+
+        <div class="mensagem-conteudo">
+
+            <p>${texto}</p>
+
+            <span class="hora-mensagem">${hora}</span>
+
+        </div>
+
+    `;
+
+    
+
+    chatMensagens.appendChild(divMensagem);
+
+}
+
+
+
+function showAlert(type, message) {
+
+    const alertDiv = document.createElement('div');
+
+    alertDiv.className = `alert ${type}`;
+
+    alertDiv.textContent = message;
+
+    document.body.prepend(alertDiv);
+
+    
+
+    setTimeout(() => {
+
+        alertDiv.style.opacity = '0';
+
+        setTimeout(() => alertDiv.remove(), 300);
+
+    }, 5000);
+
+}
+
+
+
+// Event listeners
+
+document.getElementById('chat-input').addEventListener('keypress', function(e) {
+
+    if (e.key === 'Enter') {
+
+        enviarMensagem();
+
+    }
+
+});
+
+
+
+document.getElementById('chat-modal').addEventListener('click', function(e) {
+
+    if (e.target === this) {
+
+        fecharChat();
+
+    }
+
+});
+
+
+
+// Exporta funções globais
+
+window.abrirChat = abrirChat;
+
+window.fecharChat = fecharChat;
+
+window.enviarMensagem = enviarMensagem;
+
+
+
+
+
+scripts/medico.js:
+
+
+
+document.addEventListener('DOMContentLoaded', async function() {
+
+    try {
+
+        const { user, dados: medico } = await checkAuth('medico');
+
+        
+
+        // Atualizar UI
+
+        document.getElementById('medico-nome').textContent = medico.get('nome');
+
+        document.getElementById('medico-especialidade').textContent = medico.get('especialidade');
+
+        
+
+        // Carregar consultas
+
+        await carregarConsultasDoDia(new Date());
+
+        
+
+        // Event listeners
+
+        document.getElementById('prev-day').addEventListener('click', async () => {
+
+            const currentDate = new Date(document.getElementById('current-date').textContent);
+
+            currentDate.setDate(currentDate.getDate() - 1);
+
+            await carregarConsultasDoDia(currentDate);
+
+        });
+
+        
+
+        document.getElementById('next-day').addEventListener('click', async () => {
+
+            const currentDate = new Date(document.getElementById('current-date').textContent);
+
+            currentDate.setDate(currentDate.getDate() + 1);
+
+            await carregarConsultasDoDia(currentDate);
+
+        });
+
+        
+
+    } catch (error) {
+
+        console.error('Erro:', error);
+
+        window.location.href = 'index.html';
+
+    }
+
+});
+
+
+
+async function carregarConsultasDoDia(date) {
+
+    const listaConsultas = document.getElementById('lista-consultas');
+
+    listaConsultas.innerHTML = '<p class="loading">Carregando consultas...</p>';
+
+    
+
+    try {
+
+        // Formatar data
+
+        const options = { weekday: 'long', day: 'numeric', month: 'long' };
+
+        document.getElementById('current-date').textContent = date.toLocaleDateString('pt-BR', options);
+
+        
+
+        // Buscar consultas
+
+        const Consulta = Parse.Object.extend('Consulta');
+
+        const query = new Parse.Query(Consulta);
+
+        
+
+        const medicoQuery = new Parse.Query('Medico');
+
+        medicoQuery.equalTo('user', Parse.User.current());
+
+        const medico = await medicoQuery.first();
+
+        
+
+        query.equalTo('medico', medico);
+
+        query.greaterThanOrEqualTo('data', new Date(date.setHours(0, 0, 0)));
+
+        query.lessThan('data', new Date(date.setHours(23, 59, 59)));
+
+        query.include('paciente');
+
+        query.ascending('data');
+
+        
+
+        const consultas = await query.find();
+
+        
+
+        // Renderizar consultas
+
+        listaConsultas.innerHTML = '';
+
+        
+
+        if (consultas.length === 0) {
+
+            listaConsultas.innerHTML = '<p class="empty">Nenhuma consulta agendada</p>';
+
+            return;
+
+        }
+
+        
+
+        consultas.forEach(consulta => {
+
+            const item = document.createElement('div');
+
+            item.className = 'consulta-item';
+
+            
+
+            const paciente = consulta.get('paciente');
+
+            const data = new Date(consulta.get('data'));
+
+            
+
+            item.innerHTML = `
+
+                <div class="consulta-horario">
+
+                    ${data.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+
+                </div>
+
+                <div class="consulta-info">
+
+                    <h4>${paciente.get('nome')}</h4>
+
+                    <p>${consulta.get('tipo')}</p>
+
+                    <span class="status ${consulta.get('status')}">${consulta.get('status')}</span>
+
+                </div>
+
+                <div class="consulta-actions">
+
+                    <button class="btn-confirm" onclick="confirmarConsulta('${consulta.id}')">
+
+                        Confirmar
+
+                    </button>
+
+                    <button class="btn-cancel" onclick="cancelarConsulta('${consulta.id}')">
+
+                        Cancelar
+
+                    </button>
+
+                </div>
+
+            `;
+
+            
+
+            listaConsultas.appendChild(item);
+
+        });
+
+        
+
+    } catch (error) {
+
+        console.error('Erro ao carregar consultas:', error);
+
+        listaConsultas.innerHTML = '<p class="error">Erro ao carregar consultas</p>';
+
+    }
+
+}
+
+
+
+async function confirmarConsulta(consultaId) {
+
+    try {
+
+        const Consulta = Parse.Object.extend('Consulta');
+
+        const consulta = await new Parse.Query(Consulta).get(consultaId);
+
+        
+
+        consulta.set('status', 'confirmada');
+
+        await consulta.save();
+
+        
+
+        showAlert('success', 'Consulta confirmada!');
+
+        await carregarConsultasDoDia(new Date(consulta.get('data')));
+
+        
+
+    } catch (error) {
+
+        console.error('Erro ao confirmar consulta:', error);
+
+        showAlert('error', 'Falha ao confirmar consulta');
+
+    }
+
+}
+
+
+
+async function cancelarConsulta(consultaId) {
+
+    if (!confirm('Tem certeza que deseja cancelar esta consulta?')) return;
+
+    
+
+    try {
+
+        const Consulta = Parse.Object.extend('Consulta');
+
+        const consulta = await new Parse.Query(Consulta).get(consultaId);
+
+        
+
+        consulta.set('status', 'cancelada');
+
+        await consulta.save();
+
+        
+
+        showAlert('success', 'Consulta cancelada!');
+
+        await carregarConsultasDoDia(new Date(consulta.get('data')));
+
+        
+
+    } catch (error) {
+
+        console.error('Erro ao cancelar consulta:', error);
+
+        showAlert('error', 'Falha ao cancelar consulta');
+
+    }
+
+}
+
+
+
+function showAlert(type, message) {
+
+    const alertDiv = document.createElement('div');
+
+    alertDiv.className = `alert ${type}`;
+
+    alertDiv.textContent = message;
+
+    document.body.prepend(alertDiv);
+
+    
+
+    setTimeout(() => {
+
+        alertDiv.style.opacity = '0';
+
+        setTimeout(() => alertDiv.remove(), 300);
+
+    }, 5000);
+
+}
+
+
+
+// Exporta funções globais
+
+window.confirmarConsulta = confirmarConsulta;
+
+window.cancelarConsulta = cancelarConsulta;
+
+
+
+
+
+scripts/paciente.js:
+
+
+
+document.addEventListener('DOMContentLoaded', async function() {
+
+    try {
+
+        // Verifica autenticação e obtém dados do paciente
+
+        const { user, dados: paciente } = await checkAuth('paciente');
+
+        if (!user || !paciente) throw new Error('Acesso negado');
+
+       
+
+        // Atualiza UI
+
+        document.getElementById('username').textContent = paciente.get('nome') || 'Paciente';
+
+       
+
+        // Configura menu mobile
+
+        setupMenuMobile();
+
+       
+
+        // Carrega dados iniciais
+
+        await carregarMedicosDisponiveis();
+
+        await carregarAgendamentos();
+
+
+
+        // Configura listeners
+
+        setupEventListeners();
+
+
+
+    } catch (error) {
+
+        console.error('Erro na inicialização:', error);
+
+        window.location.href = 'index.html';
+
+    }
+
+});
+
+
+
+// Configura menu mobile
+
+function setupMenuMobile() {
+
+    const menuToggle = document.createElement('div');
+
+    menuToggle.className = 'menu-toggle';
+
+    menuToggle.innerHTML = '☰';
+
+    document.body.appendChild(menuToggle);
+
+   
+
+    menuToggle.addEventListener('click', () => {
+
+        document.querySelector('.sidebar').classList.toggle('active');
+
+    });
+
+   
+
+    window.addEventListener('resize', () => {
+
+        menuToggle.style.display = window.innerWidth <= 992 ? 'flex' : 'none';
+
+        if (window.innerWidth > 992) {
+
+            document.querySelector('.sidebar').classList.remove('active');
+
+        }
+
+    });
+
+}
+
+
+
+// Configura event listeners
+
+function setupEventListeners() {
+
+    document.getElementById('form-agendamento').addEventListener('submit', async (e) => {
+
+        e.preventDefault();
+
+        await agendarConsulta();
+
+    });
+
+}
+
+
+
+// Carrega médicos disponíveis
+
+async function carregarMedicosDisponiveis() {
+
+    const selectMedico = document.getElementById('medico');
+
+    selectMedico.innerHTML = '<option value="">Carregando médicos...</option>';
+
+   
+
+    try {
+
+        const Medico = Parse.Object.extend('Medico');
+
+        const query = new Parse.Query(Medico);
+
+       
+
+        query.equalTo('ativo', true);
+
+        query.include(['user', 'especialidade']);
+
+        query.ascending('nome');
+
+       
+
+        const medicos = await query.find();
+
+       
+
+        selectMedico.innerHTML = medicos.length > 0
+
+            ? '<option value="">Selecione um médico</option>'
+
+            : '<option value="">Nenhum médico disponível</option>';
+
+       
+
+        medicos.forEach(medico => {
+
+            const option = document.createElement('option');
+
+            option.value = medico.id;
+
+            option.textContent = `Dr. ${medico.get('nome')} - ${medico.get('especialidade')}`;
+
+            selectMedico.appendChild(option);
+
+        });
+
+
+
+    } catch (error) {
+
+        console.error('Erro ao carregar médicos:', error);
+
+        selectMedico.innerHTML = '<option value="">Erro ao carregar</option>';
+
+        showAlert('error', 'Falha ao carregar lista de médicos');
+
+    }
+
+}
+
+
+
+// Agenda nova consulta (CORRIGIDO o schema mismatch)
+
+async function agendarConsulta() {
+
+    const form = document.getElementById('form-agendamento');
+
+    const tipoConsulta = document.getElementById('tipo-consulta').value;
+
+    const dataHora = document.getElementById('data-consulta').value;
+
+    const medicoId = document.getElementById('medico').value;
+
+
+
+    // Validação
+
+    if (!tipoConsulta || !dataHora || !medicoId) {
+
+        showAlert('error', 'Preencha todos os campos corretamente!');
+
+        return;
+
+    }
+
+
+
+    try {
+
+        // 1. Busca o médico e seu usuário associado
+
+        const Medico = Parse.Object.extend('Medico');
+
+        const medicoQuery = new Parse.Query(Medico);
+
+        medicoQuery.include('user');
+
+        const medico = await medicoQuery.get(medicoId);
+
+       
+
+        if (!medico || !medico.get('user')) {
+
+            throw new Error('Médico não encontrado');
+
+        }
+
+
+
+        // 2. Busca o paciente e seu usuário associado
+
+        const Paciente = Parse.Object.extend('Paciente');
+
+        const paciente = await new Parse.Query(Paciente)
+
+            .equalTo('user', Parse.User.current())
+
+            .first();
+
+
+
+        if (!paciente || !paciente.get('user')) {
+
+            throw new Error('Paciente não encontrado');
+
+        }
+
+
+
+        // 3. Cria e salva a consulta
+
+        const Consulta = Parse.Object.extend('Consulta');
+
+        const novaConsulta = new Consulta();
+
+       
+
+        const dataConsulta = new Date(dataHora);
+
+        if (isNaN(dataConsulta.getTime())) {
+
+            throw new Error('Data inválida');
+
+        }
+
+
+
+        // CORREÇÃO: Usa os objetos User associados
+
+        novaConsulta.set('medico', medico.get('user'));
+
+        novaConsulta.set('paciente', paciente.get('user'));
+
+        novaConsulta.set('tipo', tipoConsulta);
+
+        novaConsulta.set('data', dataConsulta);
+
+        novaConsulta.set('status', 'pendente');
+
+
+
+        await novaConsulta.save();
+
+       
+
+        // Feedback
+
+        showAlert('success', 'Consulta agendada com sucesso!');
+
+        form.reset();
+
+        await carregarAgendamentos();
+
+
+
+    } catch (error) {
+
+        console.error('Erro ao agendar:', error);
+
+        showAlert('error', `Falha no agendamento: ${error.message}`);
+
+    }
+
+}
+
+
+
+// Carrega agendamentos do paciente
+
+async function carregarAgendamentos() {
+
+    const listaAgendamentos = document.getElementById('lista-agendamentos');
+
+    listaAgendamentos.innerHTML = '<p class="loading">Carregando agendamentos...</p>';
+
+   
+
+    try {
+
+        // Busca o paciente e suas consultas
+
+        const Paciente = Parse.Object.extend('Paciente');
+
+        const paciente = await new Parse.Query(Paciente)
+
+            .equalTo('user', Parse.User.current())
+
+            .first();
+
+
+
+        if (!paciente) throw new Error('Paciente não encontrado');
+
+
+
+        const Consulta = Parse.Object.extend('Consulta');
+
+        const query = new Parse.Query(Consulta);
+
+       
+
+        query.equalTo('paciente', paciente.get('user'));
+
+        query.greaterThanOrEqualTo('data', new Date());
+
+        query.ascending('data');
+
+        query.include(['medico', 'paciente']);
+
+       
+
+        const consultas = await query.find();
+
+       
+
+        // Renderiza
+
+        listaAgendamentos.innerHTML = consultas.length > 0
+
+            ? ''
+
+            : '<p class="empty">Nenhuma consulta agendada</p>';
+
+       
+
+        consultas.forEach(consulta => {
+
+            const medico = consulta.get('medico');
+
+            const data = new Date(consulta.get('data'));
+
+           
+
+            const item = document.createElement('div');
+
+            item.className = 'agendamento-item';
+
+            item.innerHTML = `
+
+                <div class="agendamento-data">
+
+                    ${data.toLocaleDateString('pt-BR')} às ${data.toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'})}
+
+                </div>
+
+                <div class="agendamento-info">
+
+                    <h4>${consulta.get('tipo')}</h4>
+
+                    <p>Com Dr. ${medico.get('nome')}</p>
+
+                    <span class="status ${consulta.get('status')}">${consulta.get('status')}</span>
+
+                </div>
+
+                <button class="btn-cancel" onclick="cancelarAgendamento('${consulta.id}')">Cancelar</button>
+
+            `;
+
+            listaAgendamentos.appendChild(item);
+
+        });
+
+
+
+    } catch (error) {
+
+        console.error('Erro ao carregar agendamentos:', error);
+
+        listaAgendamentos.innerHTML = '<p class="error">Erro ao carregar consultas</p>';
+
+    }
+
+}
+
+
+
+// Cancela um agendamento
+
+async function cancelarAgendamento(consultaId) {
+
+    if (!confirm('Deseja realmente cancelar esta consulta?')) return;
+
+   
+
+    try {
+
+        const Consulta = Parse.Object.extend('Consulta');
+
+        const consulta = await new Parse.Query(Consulta).get(consultaId);
+
+        await consulta.destroy();
+
+       
+
+        showAlert('success', 'Consulta cancelada com sucesso!');
+
+        await carregarAgendamentos();
+
+       
+
+    } catch (error) {
+
+        console.error('Erro ao cancelar:', error);
+
+        showAlert('error', 'Falha ao cancelar consulta');
+
+    }
+
+}
+
+
+
+// Mostra alertas
+
+function showAlert(type, message) {
+
+    const alertDiv = document.createElement('div');
+
+    alertDiv.className = `alert ${type}`;
+
+    alertDiv.textContent = message;
+
+    document.body.prepend(alertDiv);
+
+   
+
+    setTimeout(() => {
+
+        alertDiv.style.opacity = '0';
+
+        setTimeout(() => alertDiv.remove(), 300);
+
+    }, 5000);
+
+}
+
+
+
+// Exporta funções globais
+
+window.cancelarAgendamento = cancelarAgendamento;
+
+
+
+
+
+scripts/parseConfig.js:
+
+
+
+// Configuração do Parse/Back4App
+
+(function() {
+
+    Parse.initialize(
+
+        "bOFYz8xlcuDmnYIAKE06FpKMDh4zZXjwUQk3HgeD",
+
+        "Ct8Ktu8KYcruwQALT7FOkvAZSkIhUXfO2IcB2uCU"
+
+    );
+
+    Parse.serverURL = 'https://parseapi.back4app.com/';
+
+    console.log('Parse configurado com sucesso');
+
+})();
+
+
+
+Aqui estão todos os codigos, analise tudo pf
