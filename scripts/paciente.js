@@ -90,34 +90,35 @@ async function agendarConsulta() {
     const dataHora = document.getElementById('data-consulta').value;
     const medicoId = document.getElementById('medico').value;
 
-    // Validação
     if (!tipoConsulta || !dataHora || !medicoId) {
         showAlert('error', 'Preencha todos os campos corretamente!');
         return;
     }
 
     try {
-        // 1. Busca o médico e seu usuário associado
+        // 1. Busca APENAS o objeto Medico. Não precisamos incluir o User.
         const Medico = Parse.Object.extend('Medico');
         const medicoQuery = new Parse.Query(Medico);
-        medicoQuery.include('user');
+        // A LINHA "medicoQuery.include('user');" FOI REMOVIDA DAQUI.
         const medico = await medicoQuery.get(medicoId);
-        
-        if (!medico || !medico.get('user')) {
-            throw new Error('Médico não encontrado');
+
+        // A verificação '!medico.get('user')' foi removida pois causava o erro de permissão.
+        // A linha acima já garante que o médico existe.
+        if (!medico) {
+            throw new Error('Médico não foi encontrado no banco de dados.');
         }
 
-        // 2. Busca o paciente e seu usuário associado
+        // 2. Busca o objeto Paciente do usuário que está logado.
         const Paciente = Parse.Object.extend('Paciente');
         const paciente = await new Parse.Query(Paciente)
             .equalTo('user', Parse.User.current())
             .first();
 
-        if (!paciente || !paciente.get('user')) {
-            throw new Error('Paciente não encontrado');
+        if (!paciente) {
+            throw new Error('Perfil de paciente não encontrado para o usuário logado.');
         }
 
-        // 3. Cria e salva a consulta
+        // 3. Cria a nova consulta.
         const Consulta = Parse.Object.extend('Consulta');
         const novaConsulta = new Consulta();
         
@@ -126,16 +127,18 @@ async function agendarConsulta() {
             throw new Error('Data inválida');
         }
 
-        // CORREÇÃO: Usa os objetos User associados
-        novaConsulta.set('medico', medico.get('user'));
-        novaConsulta.set('paciente', paciente.get('user'));
+        // **AQUI ESTÁ A CORREÇÃO PRINCIPAL**
+        // Assumindo que você já alterou o schema da classe "Consulta" como sugeri,
+        // para que os ponteiros apontem para as classes "Medico" e "Paciente".
+        novaConsulta.set('medico', medico);       // Aponta para o objeto Medico completo
+        novaConsulta.set('paciente', paciente);   // Aponta para o objeto Paciente completo
+        
         novaConsulta.set('tipo', tipoConsulta);
         novaConsulta.set('data', dataConsulta);
         novaConsulta.set('status', 'pendente');
 
         await novaConsulta.save();
         
-        // Feedback
         showAlert('success', 'Consulta agendada com sucesso!');
         form.reset();
         await carregarAgendamentos();
