@@ -1,8 +1,8 @@
 // Configuração do Parse/Back4App
 (function() {
     Parse.initialize(
-        "bOFYz8xlcuDmnYIAKE06FpKMDh4zZXjwUQk3HgeD",
-        "Ct8Ktu8KYcruwQALT7FOkvAZSkIhUXfO2IcB2uCU"
+        "O5RCNaudODvWDKuPigkfIpAx5mKtbxmkDrcXIFGh",
+        "rBo5DN9nzWQZAzVY679plKlUMGTyMGuzfN9gPVO2"
     );
     Parse.serverURL = 'https://parseapi.back4app.com/';
     console.log('Parse configurado com sucesso');
